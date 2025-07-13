@@ -47,20 +47,12 @@ fn test_initialize() {
 
     let (token_address, _token_client) = create_test_token(&env);
 
-    let group_members = vec![
-        &env,
-        GroupMember {
-            address: member1.clone(),
-            amount: 100,
-        },
-        GroupMember {
-            address: member2.clone(),
-            amount: 200,
-        },
-    ];
+    let group_members_addresses = vec![&env, member1.clone(), member2.clone()];
+    let group_members_amounts = vec![&env, 100u64, 200u64];
 
     client.initialize(
-        &group_members,
+        &group_members_addresses,
+        &group_members_amounts,
         &admin,
         &delegator,
         &(env.ledger().timestamp() + 3600), // 1 hour from now
@@ -97,20 +89,12 @@ fn test_deposit() {
     token_client.mint(&member1, &1000);
     token_client.mint(&member2, &1000);
 
-    let group_members = vec![
-        &env,
-        GroupMember {
-            address: member1.clone(),
-            amount: 100,
-        },
-        GroupMember {
-            address: member2.clone(),
-            amount: 200,
-        },
-    ];
+    let group_members_addresses = vec![&env, member1.clone(), member2.clone()];
+    let group_members_amounts = vec![&env, 100u64, 200u64];
 
     client.initialize(
-        &group_members,
+        &group_members_addresses,
+        &group_members_amounts,
         &admin,
         &delegator,
         &(env.ledger().timestamp() + 3600),
@@ -153,20 +137,12 @@ fn test_release() {
     token_client.mint(&member1, &1000);
     token_client.mint(&member2, &1000);
 
-    let group_members = vec![
-        &env,
-        GroupMember {
-            address: member1.clone(),
-            amount: 100,
-        },
-        GroupMember {
-            address: member2.clone(),
-            amount: 200,
-        },
-    ];
+    let group_members_addresses = vec![&env, member1.clone(), member2.clone()];
+    let group_members_amounts = vec![&env, 100u64, 200u64];
 
     client.initialize(
-        &group_members,
+        &group_members_addresses,
+        &group_members_amounts,
         &admin,
         &delegator,
         &(env.ledger().timestamp() + 3600),
@@ -205,21 +181,13 @@ fn test_return_funds() {
     token_client.mint(&member1, &1000);
     token_client.mint(&member2, &1000);
 
-    let group_members = vec![
-        &env,
-        GroupMember {
-            address: member1.clone(),
-            amount: 100,
-        },
-        GroupMember {
-            address: member2.clone(),
-            amount: 200,
-        },
-    ];
+    let group_members_addresses = vec![&env, member1.clone(), member2.clone()];
+    let group_members_amounts = vec![&env, 100u64, 200u64];
 
     let current_time = env.ledger().timestamp();
     client.initialize(
-        &group_members,
+        &group_members_addresses,
+        &group_members_amounts,
         &admin,
         &delegator,
         &(current_time + 3600),
@@ -264,17 +232,13 @@ fn test_deposit_after_deadline() {
     let (token_address, token_client) = create_test_token(&env);
     token_client.mint(&member1, &1000);
 
-    let group_members = vec![
-        &env,
-        GroupMember {
-            address: member1.clone(),
-            amount: 100,
-        },
-    ];
+    let group_members_addresses = vec![&env, member1.clone()];
+    let group_members_amounts = vec![&env, 100u64];
 
     let current_time = env.ledger().timestamp();
     client.initialize(
-        &group_members,
+        &group_members_addresses,
+        &group_members_amounts,
         &admin,
         &delegator,
         &(current_time + 100),
@@ -304,16 +268,12 @@ fn test_double_deposit() {
     let (token_address, token_client) = create_test_token(&env);
     token_client.mint(&member1, &1000);
 
-    let group_members = vec![
-        &env,
-        GroupMember {
-            address: member1.clone(),
-            amount: 100,
-        },
-    ];
+    let group_members_addresses = vec![&env, member1.clone()];
+    let group_members_amounts = vec![&env, 100u64];
 
     client.initialize(
-        &group_members,
+        &group_members_addresses,
+        &group_members_amounts,
         &admin,
         &delegator,
         &(env.ledger().timestamp() + 3600),

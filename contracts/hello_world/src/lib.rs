@@ -63,7 +63,8 @@ impl GroupPaymentContract {
     /// Initialize the group payment contract
     pub fn initialize(
         env: Env,
-        group_members: Vec<GroupMember>,
+        group_members_addresses: Vec<Address>,
+        group_members_amounts: Vec<u64>,
         admin: Address,
         delegator: Address,
         deadline: u64,
@@ -77,14 +78,25 @@ impl GroupPaymentContract {
         // Require admin authorization
         admin.require_auth();
 
-        // Calculate total amount
+        // Validate that addresses and amounts have same length
+        if group_members_addresses.len() != group_members_amounts.len() {
+            panic_with_error!(&env, GroupPaymentError::InvalidAmount);
+        }
+
+        // Calculate total amount and create group members vec
         let mut total_amount: u64 = 0;
-        for member in group_members.iter() {
-            total_amount += member.amount;
+        let mut group_members: Vec<GroupMember> = Vec::new(&env);
+
+        for i in 0..group_members_addresses.len() {
+            let address = group_members_addresses.get(i).unwrap();
+            let amount = group_members_amounts.get(i).unwrap();
+
+            total_amount += amount;
+            group_members.push_back(GroupMember { address: address.clone(), amount });
 
             // Store individual member amounts and payment status
-            env.storage().persistent().set(&DataKey::Amount(member.address.clone()), &member.amount);
-            env.storage().persistent().set(&DataKey::IsPaid(member.address.clone()), &false);
+            env.storage().persistent().set(&DataKey::Amount(address.clone()), &amount);
+            env.storage().persistent().set(&DataKey::IsPaid(address.clone()), &false);
         }
 
         // Store initialization data
