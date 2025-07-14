@@ -10,9 +10,6 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <div className="px-4 py-4 shadow-sm z-10 bg-[#c6ff00]">
-        {/* Puedes agregar un saludo u otra info si lo deseas */}
-      </div>
 
       {/* Expenses List */}
       <div className="px-4 py-6 space-y-4">
