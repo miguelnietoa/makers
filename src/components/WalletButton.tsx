@@ -1,79 +1,74 @@
 import { useState } from "react";
-import { Button, Text, Modal, Profile } from "@stellar/design-system";
 import { useWallet } from "../hooks/useWallet";
 import { useWalletBalance } from "../hooks/useWalletBalance";
 import { connectWallet, disconnectWallet } from "../util/wallet";
 
 export const WalletButton = () => {
-  const [showDisconnectModal, setShowDisconnectModal] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const { address, isPending } = useWallet();
-  const { xlm, ...balance } = useWalletBalance();
+  const { xlm, isLoading } = useWalletBalance();
+
   const buttonLabel = isPending ? "Loading..." : "Connect";
 
   if (!address) {
     return (
-      <Button variant="primary" size="md" onClick={() => void connectWallet()}>
+      <button
+        type="button"
+        onClick={() => void connectWallet()}
+        className="bg-primary border border-primary text-black px-4 py-2 rounded-md text-sm font-medium hover:bg-primary/80 transition"
+      >
         {buttonLabel}
-      </Button>
+      </button>
     );
   }
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "center",
-        gap: "5px",
-        opacity: balance.isLoading ? 0.6 : 1,
-      }}
-    >
-      <Text as="div" size="sm">
-        Wallet Balance: {xlm} XLM
-      </Text>
+    <div className={`flex items-center gap-3 ${isLoading ? "opacity-60" : ""}`}>
+      <span className="text-sm text-gray-700">Wallet Balance: {xlm} XLM</span>
 
-      <div id="modalContainer">
-        <Modal
-          visible={showDisconnectModal}
-          onClose={() => setShowDisconnectModal(false)}
-          parentId="modalContainer"
-        >
-          <Modal.Heading>
-            Connected as{" "}
-            <code style={{ lineBreak: "anywhere" }}>{address}</code>. Do you
-            want to disconnect?
-          </Modal.Heading>
-          <Modal.Footer itemAlignment="stack">
-            <Button
-              size="md"
-              variant="primary"
-              onClick={() => {
-                void disconnectWallet().then(() =>
-                  setShowDisconnectModal(false),
-                );
-              }}
-            >
-              Disconnect
-            </Button>
-            <Button
-              size="md"
-              variant="tertiary"
-              onClick={() => {
-                setShowDisconnectModal(false);
-              }}
-            >
-              Cancel
-            </Button>
-          </Modal.Footer>
-        </Modal>
-      </div>
+      <button
+        type="button"
+        onClick={() => setShowModal(true)}
+        className="bg-gray-200 hover:bg-gray-300 text-gray-900 px-3 py-1 rounded-md text-sm font-medium transition"
+      >
+        {address.slice(0, 4)}...{address.slice(-4)}
+      </button>
 
-      <Profile
-        publicAddress={address}
-        size="md"
-        isShort
-        onClick={() => setShowDisconnectModal(true)}
-      />
+      {showModal && (
+        <div className="fixed inset-0 z-100 flex items-center justify-center backdrop-blur-sm bg-black/30">
+          <div className="bg-white rounded-md shadow-lg p-6 w-[90%] max-w-md">
+            <h2 className="text-lg font-semibold mb-4 text-center">
+              <span className="block text-sm text-gray-500 mb-1">
+                Connected as
+              </span>
+              <code className="block text-sm font-mono text-gray-700 break-words bg-gray-100 px-2 py-1 rounded">
+                {address}
+              </code>
+              <span className="block mt-4 text-base text-gray-700">
+                Do you want to disconnect?
+              </span>
+            </h2>
+            <div className="flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() =>
+                  void disconnectWallet().then(() => setShowModal(false))
+                }
+                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm"
+              >
+                Disconnect
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowModal(false)}
+                className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-md text-sm"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -1,4 +1,3 @@
-// import { Button, Icon, Layout } from "@stellar/design-system";
 import "./App.module.css";
 // import ConnectAccount from "./components/ConnectAccount.tsx";
 import { Routes, Route, Outlet, Navigate } from "react-router-dom";
@@ -11,38 +10,15 @@ import CreateExpense from "./pages/CreateExpense.tsx";
 import Profile from "./pages/Profile.tsx";
 import Navbar from "./components/Navbar.tsx";
 import CreateGroup from "./components/CreateGroup.tsx";
+import ConnectAccount from "./components/ConnectAccount.tsx";
 const NAV_HEIGHT = 60;
 const AppLayout: React.FC = () => (
   <main className="min-h-screen flex flex-col bg-white">
-    {/* <Layout.Header
-      projectId="My App"
-      projectTitle="My App"
-      contentRight={
-        <>
-          <nav>
-            <NavLink
-              to="/debug"
-              style={{
-                textDecoration: "none",
-              }}
-            >
-              {({ isActive }) => (
-                <Button
-                  variant="tertiary"
-                  size="md"
-                  onClick={() => (window.location.href = "/debug")}
-                  disabled={isActive}
-                >
-                  <Icon.Code02 size="md" />
-                  Debugger
-                </Button>
-              )}
-            </NavLink>
-          </nav>
-          <ConnectAccount />
-        </>
-      }
-    /> */}
+    <div className="flex justify-between items-center p-4">
+      {/* <img src="/logo.svg" alt="Logo" className="h-8 w-auto" /> */}
+      <span className="text-2xl font-bold">Woopi</span>
+      <ConnectAccount />
+    </div>
     <div
       className="flex-1 overflow-y-auto"
       style={{ paddingBottom: NAV_HEIGHT }}
