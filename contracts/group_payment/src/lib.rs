@@ -1,17 +1,9 @@
 #![no_std]
 use soroban_sdk::{
-    contract, contracterror, contractimpl, contracttype, panic_with_error, token,
-    Address, Env, Vec,
+    contract, contracterror, contractimpl, contracttype, panic_with_error, token, Address, Env, Vec,
 };
 
 // Data structures
-#[contracttype]
-#[derive(Clone, Debug, Eq, PartialEq)]
-pub enum Asset {
-    Native,
-    Contract(Address),
-}
-
 #[contracttype]
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum Status {
@@ -32,7 +24,7 @@ pub enum DataKey {
     Admin,
     Delegator,
     Deadline,
-    Asset,
+    TokenAddress,
     Status,
     PaidAmount,
     TotalAmount,
@@ -63,12 +55,11 @@ impl GroupPaymentContract {
     /// Initialize the group payment contract
     pub fn initialize(
         env: Env,
-        group_members_addresses: Vec<Address>,
-        group_members_amounts: Vec<u64>,
+        group_members: Vec<GroupMember>,
         admin: Address,
         delegator: Address,
         deadline: u64,
-        asset: Asset,
+        token_address: Address,
     ) {
         // Ensure contract is not already initialized
         if env.storage().instance().has(&DataKey::Admin) {
@@ -78,36 +69,37 @@ impl GroupPaymentContract {
         // Require admin authorization
         admin.require_auth();
 
-        // Validate that addresses and amounts have same length
-        if group_members_addresses.len() != group_members_amounts.len() {
-            panic_with_error!(&env, GroupPaymentError::InvalidAmount);
-        }
-
-        // Calculate total amount and create group members vec
+        // Calculate total amount
         let mut total_amount: u64 = 0;
-        let mut group_members: Vec<GroupMember> = Vec::new(&env);
-
-        for i in 0..group_members_addresses.len() {
-            let address = group_members_addresses.get(i).unwrap();
-            let amount = group_members_amounts.get(i).unwrap();
-
-            total_amount += amount;
-            group_members.push_back(GroupMember { address: address.clone(), amount });
+        for member in group_members.iter() {
+            total_amount += member.amount;
 
             // Store individual member amounts and payment status
-            env.storage().persistent().set(&DataKey::Amount(address.clone()), &amount);
-            env.storage().persistent().set(&DataKey::IsPaid(address.clone()), &false);
+            env.storage()
+                .persistent()
+                .set(&DataKey::Amount(member.address.clone()), &member.amount);
+            env.storage()
+                .persistent()
+                .set(&DataKey::IsPaid(member.address.clone()), &false);
         }
 
         // Store initialization data
         env.storage().instance().set(&DataKey::Admin, &admin);
-        env.storage().instance().set(&DataKey::Delegator, &delegator);
+        env.storage()
+            .instance()
+            .set(&DataKey::Delegator, &delegator);
         env.storage().instance().set(&DataKey::Deadline, &deadline);
-        env.storage().instance().set(&DataKey::Asset, &asset);
-        env.storage().instance().set(&DataKey::Status, &Status::Active);
+        env.storage().instance().set(&DataKey::TokenAddress, &token_address);
+        env.storage()
+            .instance()
+            .set(&DataKey::Status, &Status::Active);
         env.storage().instance().set(&DataKey::PaidAmount, &0u64);
-        env.storage().instance().set(&DataKey::TotalAmount, &total_amount);
-        env.storage().instance().set(&DataKey::GroupMembers, &group_members);
+        env.storage()
+            .instance()
+            .set(&DataKey::TotalAmount, &total_amount);
+        env.storage()
+            .instance()
+            .set(&DataKey::GroupMembers, &group_members);
     }
 
     /// Member deposits their portion
@@ -127,11 +119,15 @@ impl GroupPaymentContract {
         }
 
         // Check if member exists and hasn't paid
-        let required_amount: u64 = env.storage().persistent()
+        let required_amount: u64 = env
+            .storage()
+            .persistent()
             .get(&DataKey::Amount(from.clone()))
             .unwrap_or_else(|| panic_with_error!(&env, GroupPaymentError::MemberNotFound));
 
-        let is_paid: bool = env.storage().persistent()
+        let is_paid: bool = env
+            .storage()
+            .persistent()
             .get(&DataKey::IsPaid(from.clone()))
             .unwrap_or(false);
 
@@ -144,27 +140,22 @@ impl GroupPaymentContract {
         }
 
         // Transfer tokens to contract
-        let asset: Asset = env.storage().instance().get(&DataKey::Asset).unwrap();
+        let token_address: Address = env.storage().instance().get(&DataKey::TokenAddress).unwrap();
         let contract_address = env.current_contract_address();
 
-        match asset {
-            Asset::Native => {
-                // For native token (XLM), we would need to handle differently
-                // This is a simplified version
-                panic_with_error!(&env, GroupPaymentError::InvalidAmount);
-            }
-            Asset::Contract(token_address) => {
-                let token_client = token::Client::new(&env, &token_address);
-                token_client.transfer(&from, &contract_address, &(amount as i128));
-            }
-        }
+        let token_client = token::Client::new(&env, &token_address);
+        token_client.transfer(&from, &contract_address, &(amount as i128));
 
         // Update payment status
-        env.storage().persistent().set(&DataKey::IsPaid(from.clone()), &true);
+        env.storage()
+            .persistent()
+            .set(&DataKey::IsPaid(from.clone()), &true);
 
         // Update total paid amount
         let current_paid: u64 = env.storage().instance().get(&DataKey::PaidAmount).unwrap();
-        env.storage().instance().set(&DataKey::PaidAmount, &(current_paid + amount));
+        env.storage()
+            .instance()
+            .set(&DataKey::PaidAmount, &(current_paid + amount));
     }
 
     /// Release funds (only callable by delegator)
@@ -187,19 +178,11 @@ impl GroupPaymentContract {
         }
 
         // Transfer all funds to the specified address
-        let asset: Asset = env.storage().instance().get(&DataKey::Asset).unwrap();
+        let token_address: Address = env.storage().instance().get(&DataKey::TokenAddress).unwrap();
         let contract_address = env.current_contract_address();
 
-        match asset {
-            Asset::Native => {
-                // For native token (XLM), we would need to handle differently
-                panic_with_error!(&env, GroupPaymentError::InvalidAmount);
-            }
-            Asset::Contract(token_address) => {
-                let token_client = token::Client::new(&env, &token_address);
-                token_client.transfer(&contract_address, &to, &(total_amount as i128));
-            }
-        }
+        let token_client = token::Client::new(&env, &token_address);
+        token_client.transfer(&contract_address, &to, &(total_amount as i128));
 
         // Mark contract as completed by setting paid amount to 0
         env.storage().instance().set(&DataKey::PaidAmount, &0u64);
@@ -216,36 +199,39 @@ impl GroupPaymentContract {
             panic_with_error!(&env, GroupPaymentError::Unauthorized);
         }
 
-
-
-
         // Mark as unfulfilled
-        env.storage().instance().set(&DataKey::Status, &Status::Unfulfilled);
+        env.storage()
+            .instance()
+            .set(&DataKey::Status, &Status::Unfulfilled);
 
         // Return funds to all members who paid
-        let group_members: Vec<GroupMember> = env.storage().instance().get(&DataKey::GroupMembers).unwrap();
-        let asset: Asset = env.storage().instance().get(&DataKey::Asset).unwrap();
+        let group_members: Vec<GroupMember> = env
+            .storage()
+            .instance()
+            .get(&DataKey::GroupMembers)
+            .unwrap();
+        let token_address: Address = env.storage().instance().get(&DataKey::TokenAddress).unwrap();
         let contract_address = env.current_contract_address();
 
         for member in group_members.iter() {
-            let is_paid: bool = env.storage().persistent()
+            let is_paid: bool = env
+                .storage()
+                .persistent()
                 .get(&DataKey::IsPaid(member.address.clone()))
                 .unwrap_or(false);
 
             if is_paid {
-                match &asset {
-                    Asset::Native => {
-                        // Handle native token return
-                        panic_with_error!(&env, GroupPaymentError::InvalidAmount);
-                    }
-                    Asset::Contract(token_address) => {
-                        let token_client = token::Client::new(&env, token_address);
-                        token_client.transfer(&contract_address, &member.address, &(member.amount as i128));
-                    }
-                }
+                let token_client = token::Client::new(&env, &token_address);
+                token_client.transfer(
+                    &contract_address,
+                    &member.address,
+                    &(member.amount as i128),
+                );
 
                 // Mark as unpaid after return
-                env.storage().persistent().set(&DataKey::IsPaid(member.address.clone()), &false);
+                env.storage()
+                    .persistent()
+                    .set(&DataKey::IsPaid(member.address.clone()), &false);
             }
         }
 
@@ -271,7 +257,10 @@ impl GroupPaymentContract {
     }
 
     pub fn is_member_paid(env: Env, member: Address) -> bool {
-        env.storage().persistent().get(&DataKey::IsPaid(member)).unwrap_or(false)
+        env.storage()
+            .persistent()
+            .get(&DataKey::IsPaid(member))
+            .unwrap_or(false)
     }
 
     pub fn get_member_amount(env: Env, member: Address) -> Option<u64> {
@@ -286,12 +275,15 @@ impl GroupPaymentContract {
         env.storage().instance().get(&DataKey::Delegator).unwrap()
     }
 
-    pub fn get_asset(env: Env) -> Asset {
-        env.storage().instance().get(&DataKey::Asset).unwrap()
+    pub fn get_token_address(env: Env) -> Address {
+        env.storage().instance().get(&DataKey::TokenAddress).unwrap()
     }
 
     pub fn get_group_members(env: Env) -> Vec<GroupMember> {
-        env.storage().instance().get(&DataKey::GroupMembers).unwrap()
+        env.storage()
+            .instance()
+            .get(&DataKey::GroupMembers)
+            .unwrap()
     }
 }
 

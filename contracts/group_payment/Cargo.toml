@@ -1,6 +1,6 @@
 [package]
-name = "stellar-hello-world-contract"
-description = "A simple hello world contract"
+name = "group-payment-contract"
+description = "A Soroban smart contract for managing group payments with deadline-based fund collection and release mechanisms"
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
