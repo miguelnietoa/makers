@@ -6,37 +6,45 @@ interface FriendCardProps {
 }
 
 export default function FriendCard({ friend, balance }: FriendCardProps) {
-  const getBalanceColor = (balance: number) => {
-    if (balance > 0) return "text-green-600";
-    if (balance < 0) return "text-red-600";
-    return "text-gray-600";
-  };
+  /* ───────── helpers ───────── */
+  const color =
+    balance > 0
+      ? "text-green-600 bg-green-50"
+      : balance < 0
+        ? "text-red-600 bg-red-50"
+        : "text-gray-600 bg-gray-50";
 
-  const getBalanceText = (balance: number) => {
-    if (balance > 0) return `owes you $${balance.toFixed(2)}`;
-    if (balance < 0) return `you owe $${Math.abs(balance).toFixed(2)}`;
-    return "settled up";
-  };
+  const text =
+    balance > 0
+      ? `owes you $${balance.toFixed(2)}`
+      : balance < 0
+        ? `you owe $${Math.abs(balance).toFixed(2)}`
+        : "settled up";
 
+  /* ───────── UI ───────── */
   return (
-    <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200 mb-2">
-      <div className="flex items-center">
-        <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center mr-3">
-          <span className="text-primary-600 font-semibold">
-            {friend.name.charAt(0).toUpperCase()}
+    <div
+      className="bg-white rounded-lg p-4 mb-3 shadow-lg border border-gray-200
+                 transition hover:-translate-y-[1px] flex items-center justify-between"
+    >
+      {/* avatar + info */}
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+          <span className="text-primary font-semibold">
+            {friend.name[0].toUpperCase()}
           </span>
         </div>
+
         <div>
           <p className="font-medium text-gray-900">{friend.name}</p>
           <p className="text-sm text-gray-500">{friend.email}</p>
         </div>
       </div>
 
-      <div className="text-right">
-        <p className={`text-sm font-medium ${getBalanceColor(balance)}`}>
-          {getBalanceText(balance)}
-        </p>
-      </div>
+      {/* balance badge */}
+      <span className={`px-3 py-1 text-xs font-medium rounded-full ${color}`}>
+        {text}
+      </span>
     </div>
   );
 }

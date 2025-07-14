@@ -13,8 +13,8 @@ import CreateGroup from "./components/CreateGroup.tsx";
 import ConnectAccount from "./components/ConnectAccount.tsx";
 const NAV_HEIGHT = 60;
 const AppLayout: React.FC = () => (
-  <main className="min-h-screen flex flex-col bg-white">
-    <div className="flex justify-between items-center p-4">
+  <main className="min-h-screen flex flex-col bg-[#ffffff]">
+    <div className="flex justify-between items-center p-4 bg-[#c6ff00]">
       {/* <img src="/logo.svg" alt="Logo" className="h-8 w-auto" /> */}
       <span className="text-2xl font-bold">Woopi</span>
       <ConnectAccount />
