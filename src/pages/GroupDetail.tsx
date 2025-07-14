@@ -25,21 +25,6 @@ export default function GroupDetail() {
         <p className="text-gray-600 mt-1">{members.length} members</p>
 
         {/* Balance Summary */}
-        <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-          <div className="text-center">
-            {/* {group.yourBalance > 0 ? (
-              <p className="text-green-600 font-semibold">
-                You are owed ${group.yourBalance.toFixed(2)}
-              </p>
-            ) : group.yourBalance < 0 ? (
-              <p className="text-red-600 font-semibold">
-                You owe ${Math.abs(group.yourBalance).toFixed(2)}
-              </p>
-            ) : (
-              <p className="text-gray-600 font-semibold">🎉 All settled up!</p>
-            )} */}
-          </div>
-        </div>
       </div>
 
       {/* Members Section */}

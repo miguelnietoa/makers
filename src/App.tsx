@@ -11,21 +11,22 @@ import Profile from "./pages/Profile.tsx";
 import Navbar from "./components/Navbar.tsx";
 import CreateGroup from "./components/CreateGroup.tsx";
 import ConnectAccount from "./components/ConnectAccount.tsx";
-const NAV_HEIGHT = 60;
+import ShareGroup from "./components/ShareGroup.tsx";
 const AppLayout: React.FC = () => (
-  <main className="min-h-screen flex flex-col bg-[#ffffff]">
-    <div className="flex justify-between items-center p-4 bg-[#c6ff00]">
-      {/* <img src="/logo.svg" alt="Logo" className="h-8 w-auto" /> */}
+  <main className="min-h-screen flex flex-col bg-[#c6ff00]">
+    <div
+      className=" bg-[#c6ff00] z-50
+                 flex justify-between items-center px-4 py-2"
+    >
       <span className="text-2xl font-bold">Woopi</span>
       <ConnectAccount />
     </div>
-    <div
-      className="flex-1 overflow-y-auto"
-      style={{ paddingBottom: NAV_HEIGHT }}
-    >
+    <div className="flex-1 overflow-y-auto">
       <Outlet />
     </div>
-    <Navbar />
+    <div className="h-[60px] border-t border-gray-200">
+      <Navbar />
+    </div>
     {/* <Layout.Footer>
       <span>
         © {new Date().getFullYear()} My App. Licensed under the{" "}
@@ -53,6 +54,8 @@ function App() {
         <Route path="/expenses/:id" element={<ExpenseDetail />} />
         <Route path="/create" element={<CreateExpense />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/groups/:id/share" element={<ShareGroup />} />
+        {/* <Route path="/join/:id" element={<JoinGroup />} /> */}
         <Route path="/debug" element={<Debugger />} />
         <Route path="/debug/:contractName" element={<Debugger />} />
         <Route path="/" element={<Navigate to="/home" replace />} />

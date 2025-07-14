@@ -6,7 +6,7 @@ import { connectWallet, disconnectWallet } from "../util/wallet";
 export const WalletButton = () => {
   const [showModal, setShowModal] = useState(false);
   const { address, isPending } = useWallet();
-  const { xlm, isLoading } = useWalletBalance();
+  const { isLoading } = useWalletBalance();
 
   const buttonLabel = isPending ? "Loading..." : "Connect";
 
@@ -24,7 +24,7 @@ export const WalletButton = () => {
 
   return (
     <div className={`flex items-center gap-3 ${isLoading ? "opacity-60" : ""}`}>
-      <span className="text-sm text-gray-700">Wallet Balance: {xlm} XLM</span>
+      {/* <span className="text-sm text-gray-700">Wallet Balance: {xlm} XLM</span> */}
 
       <button
         type="button"
