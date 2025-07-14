@@ -33,6 +33,9 @@ import { getI128Error } from "./methods/getI128Error";
 import { getI256Error } from "./methods/getI256Error";
 import { getDataUrlError } from "./methods/getDataUrlError";
 
+// // Load .env variables
+// import 'dotenv/config';
+
 export const validate = {
   getAccountThresholdError,
   getAmountError,

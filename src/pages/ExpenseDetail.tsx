@@ -3,7 +3,7 @@
 import { useParams } from "react-router-dom";
 import { mockExpenses } from "../mock/mockExpenses";
 import { mockUsers } from "../mock/mockUsers";
-import PayButton from "../components/Paybutton";
+import PayButton from "../components/PayButton";
 import HelpButton from "../components/HelpButton";
 import WithdrawButton from "../components/WithdrawButton";
 
