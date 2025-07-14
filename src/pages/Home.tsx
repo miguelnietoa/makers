@@ -10,6 +10,12 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
+      <div className=" border-b border-gray-200 px-4 pb-8 pt-2 bg-[#c6ff00] flex flex-col gap-1">
+        <span className="text-2xl font-bold text-gray-900">
+          💰 Welcome back!
+        </span>
+        <p className="text-gray-600 mt-1">Manage your debts and expenses</p>
+      </div>
 
       {/* Expenses List */}
       <div className="px-4 py-6 space-y-4">

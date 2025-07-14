@@ -25,8 +25,10 @@ export default function CreateExpense() {
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-4 py-6">
-        <h1 className="text-2xl font-bold text-gray-900">➕ Create Expense</h1>
+      <div className=" border-b border-gray-200 px-4 pb-8 pt-2 bg-[#c6ff00] flex flex-col gap-1">
+        <span className="text-2xl font-bold text-gray-900">
+          ➕ Create Expense
+        </span>
         <p className="text-gray-600 mt-1">Add a new expense to split</p>
       </div>
 
