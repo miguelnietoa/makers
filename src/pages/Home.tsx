@@ -5,15 +5,11 @@ import ConnectAccount from "../components/ConnectAccount";
 import UserRegistrationForm from "../components/UserRegistrationForm";
 import { useUserRegistration } from "../hooks/useUserRegistration";
 
-import { useState } from "react";
 import ExpenseCard from "../components/ExpenseCard";
 
 export default function Home() {
   const { data: expenses = [] } = useExpenses();
   const { isWalletConnected, isRegistered, isLoading } = useUserRegistration();
-  const [activeTab, setActiveTab] = useState<"expenses" | "friends">(
-    "expenses",
-  );
 
   // Show wallet connection screen if wallet is not connected
   if (!isWalletConnected) {
@@ -70,35 +66,6 @@ export default function Home() {
         <p className="text-gray-600 mt-1">Manage your debts and expenses</p>
       </div>
 
-      {/* Tabs */}
-      <div className="px-4">
-        <div className="flex">
-          <button
-            type="button"
-            onClick={() => setActiveTab("expenses")}
-            className={`flex-1 py-3 text-center text-sm font-medium transition-colors ${
-              activeTab === "expenses"
-                ? "border-b-2 border-lime-500 text-lime-600"
-                : "text-gray-400"
-            }`}
-          >
-            🧾 Expenses
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab("friends")}
-            className={`flex-1 py-3 text-center text-sm font-medium transition-colors ${
-              activeTab === "friends"
-                ? "border-b-2 border-lime-500 text-lime-600"
-                : "text-gray-400"
-            }`}
-          >
-            👥 Friends
-          </button>
-        </div>
-      </div>
-
-      {/* Content */}
       <div className="px-4 py-6 space-y-4">
         {recentExpenses.map((expense) => (
           <ExpenseCard key={expense.id} expense={expense} />
