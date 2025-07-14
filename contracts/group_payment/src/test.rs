@@ -47,20 +47,29 @@ fn test_initialize() {
 
     let (token_address, _token_client) = create_test_token(&env);
 
-    let group_members_addresses = vec![&env, member1.clone(), member2.clone()];
-    let group_members_amounts = vec![&env, 100u64, 200u64];
+    let group_members = vec![
+        &env,
+        GroupMember {
+            address: member1.clone(),
+            amount: 100,
+        },
+        GroupMember {
+            address: member2.clone(),
+            amount: 200,
+        },
+    ];
 
     client.initialize(
-        &group_members_addresses,
-        &group_members_amounts,
+        &group_members,
         &admin,
         &delegator,
         &(env.ledger().timestamp() + 3600), // 1 hour from now
-        &Asset::Contract(token_address),
+        &token_address,
     );
 
     assert_eq!(client.get_admin(), admin);
     assert_eq!(client.get_delegator(), delegator);
+    assert_eq!(client.get_token_address(), token_address);
     assert_eq!(client.get_total_amount(), 300);
     assert_eq!(client.get_paid_amount(), 0);
     assert_eq!(client.get_status(), Status::Active);
@@ -89,16 +98,24 @@ fn test_deposit() {
     token_client.mint(&member1, &1000);
     token_client.mint(&member2, &1000);
 
-    let group_members_addresses = vec![&env, member1.clone(), member2.clone()];
-    let group_members_amounts = vec![&env, 100u64, 200u64];
+    let group_members = vec![
+        &env,
+        GroupMember {
+            address: member1.clone(),
+            amount: 100,
+        },
+        GroupMember {
+            address: member2.clone(),
+            amount: 200,
+        },
+    ];
 
     client.initialize(
-        &group_members_addresses,
-        &group_members_amounts,
+        &group_members,
         &admin,
         &delegator,
         &(env.ledger().timestamp() + 3600),
-        &Asset::Contract(token_address.clone()),
+        &token_address,
     );
 
     // Member1 deposits
@@ -137,16 +154,24 @@ fn test_release() {
     token_client.mint(&member1, &1000);
     token_client.mint(&member2, &1000);
 
-    let group_members_addresses = vec![&env, member1.clone(), member2.clone()];
-    let group_members_amounts = vec![&env, 100u64, 200u64];
+    let group_members = vec![
+        &env,
+        GroupMember {
+            address: member1.clone(),
+            amount: 100,
+        },
+        GroupMember {
+            address: member2.clone(),
+            amount: 200,
+        },
+    ];
 
     client.initialize(
-        &group_members_addresses,
-        &group_members_amounts,
+        &group_members,
         &admin,
         &delegator,
         &(env.ledger().timestamp() + 3600),
-        &Asset::Contract(token_address.clone()),
+        &token_address,
     );
 
     // Both members deposit
@@ -181,17 +206,25 @@ fn test_return_funds() {
     token_client.mint(&member1, &1000);
     token_client.mint(&member2, &1000);
 
-    let group_members_addresses = vec![&env, member1.clone(), member2.clone()];
-    let group_members_amounts = vec![&env, 100u64, 200u64];
+    let group_members = vec![
+        &env,
+        GroupMember {
+            address: member1.clone(),
+            amount: 100,
+        },
+        GroupMember {
+            address: member2.clone(),
+            amount: 200,
+        },
+    ];
 
     let current_time = env.ledger().timestamp();
     client.initialize(
-        &group_members_addresses,
-        &group_members_amounts,
+        &group_members,
         &admin,
         &delegator,
         &(current_time + 3600),
-        &Asset::Contract(token_address.clone()),
+        &token_address,
     );
 
     // Only member1 deposits
@@ -232,17 +265,21 @@ fn test_deposit_after_deadline() {
     let (token_address, token_client) = create_test_token(&env);
     token_client.mint(&member1, &1000);
 
-    let group_members_addresses = vec![&env, member1.clone()];
-    let group_members_amounts = vec![&env, 100u64];
+    let group_members = vec![
+        &env,
+        GroupMember {
+            address: member1.clone(),
+            amount: 100,
+        },
+    ];
 
     let current_time = env.ledger().timestamp();
     client.initialize(
-        &group_members_addresses,
-        &group_members_amounts,
+        &group_members,
         &admin,
         &delegator,
         &(current_time + 100),
-        &Asset::Contract(token_address.clone()),
+        &token_address,
     );
 
     // Move time past deadline
@@ -268,16 +305,20 @@ fn test_double_deposit() {
     let (token_address, token_client) = create_test_token(&env);
     token_client.mint(&member1, &1000);
 
-    let group_members_addresses = vec![&env, member1.clone()];
-    let group_members_amounts = vec![&env, 100u64];
+    let group_members = vec![
+        &env,
+        GroupMember {
+            address: member1.clone(),
+            amount: 100,
+        },
+    ];
 
     client.initialize(
-        &group_members_addresses,
-        &group_members_amounts,
+        &group_members,
         &admin,
         &delegator,
         &(env.ledger().timestamp() + 3600),
-        &Asset::Contract(token_address.clone()),
+        &token_address,
     );
 
     client.deposit(&member1, &100);
